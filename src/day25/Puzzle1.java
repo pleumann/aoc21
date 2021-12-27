@@ -10,10 +10,10 @@ import java.util.ArrayList;
  * need to be done right because cucumber might die or replicate otherwise. It
  * also helps to read the instructions properly (east before south, same step).
  */
-public class Puzzle {
+public class Puzzle1 {
 
     /**
-     * Our 2D map. Unlike Game of Life we don't need a second copy.
+     * Our 2D map. Unlike Game of Life this doesn't need a second copy.
      */
     char[][] map;
     
@@ -21,6 +21,11 @@ public class Puzzle {
      * Step counter.
      */
     int step = 1;
+    
+    /**
+     * Number of rows and columns (for convenience).
+     */
+    int numRows, numCols;
     
     /**
      * Loads the initial state from a file.
@@ -41,6 +46,9 @@ public class Puzzle {
             map[i] = list.get(i).toCharArray();
         }
         
+        numRows = map.length;
+        numCols = map[0].length;
+        
     }
     
     /**
@@ -55,10 +63,9 @@ public class Puzzle {
     }
     
     /**
-     * Moves the given character from the source position to the target position
-     * if the latter is free ('.'). Returns true if movement was possible. Note
-     * there is no checking of the source. This happens one layer up, so we can
-     * use this method for both east and south movement.
+     * Performs a single move from a source position to a target position if the
+     * former contains a given type of sea cucumber (passed in c) and the latter
+     * is free ('.'). Returns true if movement was possible.
      */
     boolean move(char c, int x1, int y1, int x2, int y2) {
         if (map[x1][y1] == c) {
@@ -79,10 +86,10 @@ public class Puzzle {
     boolean east() {
         boolean changed = false;
         
-        for (int row = 0; row < map.length; row++) {  
+        for (int row = 0; row < numRows; row++) {  
             char first = map[row][0];                   // Store old first char
             int col = 0;
-            while (col < map[row].length - 1) {       
+            while (col < numCols - 1) {       
                 if (move('>', row, col, row, col + 1)) {
                     col++;                              // Skip next after move
                     changed = true;
@@ -91,8 +98,8 @@ public class Puzzle {
             }
             
             // Edge case: Movement from last column to first column.
-            if (col == map[row].length - 1 && first == '.') {
-                if (move('>', row, map[row].length - 1, row, 0)) {
+            if (col == numCols - 1 && first == '.') {
+                if (move('>', row, col, row, 0)) {
                     changed = true;
                 }
             }
@@ -108,10 +115,10 @@ public class Puzzle {
     boolean south() {
         boolean changed = false;
         
-        for (int col = 0; col < map[0].length; col++) {
+        for (int col = 0; col < numCols; col++) {
             char first = map[0][col];                   // Store old first char
             int row = 0;
-            while (row < map.length - 1) {
+            while (row < numRows - 1) {
                 if (move('v', row, col, row + 1, col)) {
                     row++;                              // Skip next after move
                     changed = true;
@@ -120,8 +127,8 @@ public class Puzzle {
             }
             
             // Edge case: Move from last row to first row.
-            if (row == map.length - 1 && first == '.') {
-                if (move('v', map.length - 1, col, 0, col)) {
+            if (row == numRows - 1 && first == '.') {
+                if (move('v', row, col, 0, col)) {
                     changed = true;
                 }
             }
@@ -148,11 +155,11 @@ public class Puzzle {
             s = south();
         }
         
-        System.out.println(step);
+        System.out.println("Sea cucumber stopped moving after " + step + " steps.");
     }
     
     public static void main(String[] args) {
-        Puzzle p = new Puzzle();
+        Puzzle1 p = new Puzzle1();
         p.init(args[0]);
         p.play();
     }
