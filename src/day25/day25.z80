@@ -1,0 +1,248 @@
+; ------------------------------------------------------------------------------
+; AoC 2021.25 "Sea Cucumber" in Z80 assembly. Algorithm follows the original
+; Java solution. Needs a BASIC "starter" program.
+; ------------------------------------------------------------------------------
+
+                org 29000
+
+; ------------------------------------------------------------------------------
+; Entry points
+; ------------------------------------------------------------------------------
+
+                jp      init
+                jp      east
+                jp      south
+                jp      blit
+
+; ------------------------------------------------------------------------------
+; Variable needed for managing the wrap-around. Stores the "old" first character
+; in a row/column.
+; ------------------------------------------------------------------------------
+
+first:
+                db      0
+
+; ------------------------------------------------------------------------------
+; INIT subroutine. Returns the address of the buffer, so BASIC knows where to
+; load the input to. 
+; ------------------------------------------------------------------------------
+
+init:
+                ld      bc,buffer
+                ret
+
+; ------------------------------------------------------------------------------
+; EAST movement subroutine. No parameters expected. Returns BC<>0 if at least
+; one piece of cucumber moved.
+; ------------------------------------------------------------------------------
+
+east:           
+                ex      af,af'
+                xor     a
+                ex      af,af'
+
+                ld      ix,buffer
+                ld      c,137
+east_rows:      
+                ld      de,ix
+                ld      hl,1
+                add     hl,de
+                ex      de,hl
+
+                ld      a,(hl)
+                ld      (first),a
+                ld      b,138
+east_cols:      
+                ld      a,(hl)
+                cp      '>'
+                jr      nz,east_next_col
+                ld      a,(de)
+                cp      '.'
+                jr      nz,east_next_col
+                ld      (hl),a
+                inc     hl
+                ld      (hl),'>'
+                inc     de
+                ex      af,af'
+                or      1
+                ex      af,af'
+                dec     b
+                jr      z,east_next_row  
+east_next_col:
+                inc     hl
+                inc     de
+                djnz    east_cols
+east_wrap:
+                ld      a,(hl)
+                cp      '>'
+                jr      nz,east_next_row
+                ld      a,(first)
+                cp      '.'
+                jr      nz,east_next_row
+                ld      (hl),'.'
+                ld      (ix),'>'
+                ex      af,af'
+                or      1
+                ex      af,af'
+
+                inc     hl
+                inc     de
+east_next_row:
+                ld      de,140
+                add     ix,de
+                dec     c
+                jr      nz,east_rows
+east_done:
+                ex      af,af'
+                ld      b,a
+                ld      c,0
+                ret
+
+; ------------------------------------------------------------------------------
+; SOUTH movement subroutine. No parameters expected. Returns BC<>0 if at least
+; one piece of cucumber moved.
+; ------------------------------------------------------------------------------
+
+south:     
+                ex      af,af'
+                xor     a
+                ex      af,af'
+
+                ld      ix,buffer
+
+                ld      c,139
+south_cols:      
+                ld      de,ix
+                ld      hl,140
+                add     hl,de
+                ex      de,hl
+
+                ld      a,(hl)
+                ld      (first),a
+
+                ld      b,136
+south_rows:     
+                ld      a,(hl)
+                cp      'v'
+                jr      nz,south_next_row
+                ld      a,(de)
+                cp      '.'
+                jr      nz,south_next_row
+                ld      (hl),a
+                ld      a,'v'
+                ld      (de),a
+                ex      af,af'
+                or      1
+                ex      af,af'
+                ld      hl,140
+                add     hl,de
+                ex      de,hl
+                dec     b
+                jr      z,south_next_col  
+south_next_row:
+                ld      hl,140
+                add     hl,de
+                ex      de,hl
+                djnz    south_rows
+south_wrap:
+                ld      a,(hl)
+                cp      'v'
+                jr      nz,south_next_col
+                ld      a,(first)
+                cp      '.'
+                jr      nz,south_next_col
+                ld      (hl),a
+                ld      (ix),'v'
+
+                ex      af,af'
+                or      1
+                ex      af,af'
+south_next_col:
+                inc     ix
+                dec     c
+                jr      nz,south_cols
+south_done:
+                ex      af,af'
+                ld      b,a
+                ld      c,0
+                ret
+
+; ------------------------------------------------------------------------------
+; BLIT subroutine. Copies the current state of the buffer to the screen.
+; ------------------------------------------------------------------------------
+
+blit:
+                ld      ix,buffer
+                ld      de,24
+                ld      b,137
+blit_loop:
+                ld      hl,16
+
+                push    hl
+                push    de
+                push    bc
+                call    set_pixels
+                pop     bc
+                pop     de
+                pop     hl
+
+                ex      de,hl
+                ld      de,140
+                add     ix,de
+                ex      de,hl
+                inc     de
+                djnz    blit_loop
+
+                ret
+
+; ------------------------------------------------------------------------------
+; SET_PIXELS subroutine. Blends in the necessary LAYER 2,1 RAM page at $C000 and
+; copies a whole line.
+;
+; Entry:    HL  x (0..255)
+;           DE  y (0..191)
+;           IX  address of pixel data
+; ------------------------------------------------------------------------------
+
+set_pixels:
+                di
+                ld      a,e
+                srl     a
+                srl     a
+                srl     a
+                srl     a
+                srl     a
+                add     a,18
+
+                db      $ed,$92,$56
+
+                ld      a,e
+                and     31
+                ld      h,a
+
+                ld      de,$c000
+                add     hl,de
+                ex      hl,de
+
+                push ix
+                pop hl
+                ld      bc,139
+                ldir
+
+                db      $ed,$91,$56,$00
+
+                ei
+                ret
+
+; ------------------------------------------------------------------------------
+; Data buffer. The input.txt file is loaded to this address and processed
+; in-place because it's fast, convenient and we don't have enough RAM to
+; keep two copies (as we do in many of the other puzzles).
+; ------------------------------------------------------------------------------
+
+buffer:
+                db      0
+
+; ------------------------------------------------------------------------------
+; End of file.
+; ------------------------------------------------------------------------------
