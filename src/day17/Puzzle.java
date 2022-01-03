@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class Puzzle {
 
-    int x1, x2, y1, y2, max, best, xmin, xmax, ymin, ymax;
+    int x1, x2, y1, y2, max;
     
     Puzzle(String s) {
         String a[] = s.split("[^0-9\\-]+");
@@ -57,16 +57,8 @@ public class Puzzle {
     }
     
     void process() {
-        best = Integer.MIN_VALUE;
-        
-        xmin = Integer.MAX_VALUE;
-        ymin = Integer.MAX_VALUE;
-        
-        xmax = Integer.MIN_VALUE;
-        ymax = Integer.MIN_VALUE;
-        
+        int best = Integer.MIN_VALUE;
         int hits = 0;
-        int misses = 0;
         
         for (int i = 1; i <= x2; i++) {
             for (int j = y1; j <= Math.abs(y1); j++) {
@@ -75,14 +67,6 @@ public class Puzzle {
                     
                     hits++;
                     best = Math.max(best, max);
-                    
-                    xmin = Math.min(xmin, i);
-                    xmax = Math.max(xmax, i);
-                    ymin = Math.min(ymin, j);
-                    ymax = Math.max(ymax, j);
-                    
-                } else {
-                    misses++;
                 }
             }
             System.out.println();
