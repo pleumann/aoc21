@@ -56,7 +56,7 @@ begin
         Exit;
       end;
             
-      if (X1 <= X) and (X <= X2) and (Y1 <= Y) and (Y <= Y2) then
+      if (X1 <= X) and (X <= X2) and (Y1 <= Y) then
       begin
         if High > Best then
         begin
@@ -159,4 +159,6 @@ begin
 
   TextColor(0);
   TextBackground(182);
+
+  GotoXY(32, 24); Write(' ');
 end.
