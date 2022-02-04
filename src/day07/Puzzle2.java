@@ -24,8 +24,8 @@ public class Puzzle2 {
             int fuel = 0;
             
             for (int j: values) {                                   // O(n)
-                int n = Math.abs(j - i);
-                fuel += (n * n + n) / 2;                            // Gauss
+                int d = Math.abs(j - i);
+                fuel += (d * d + d) / 2;                            // Gauss
             }
             
             if (fuel < bestFuel) {

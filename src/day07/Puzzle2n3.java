@@ -17,8 +17,8 @@ public class Puzzle2n3 {
             int fuel = 0;
             
             for (int j: values) {                                   // O(n^2)
-                int n = Math.abs(j - i);
-                for (int k = 1; k <= n; k++) {                      // O(n)
+                int d = Math.abs(j - i);
+                for (int k = 1; k <= d; k++) {                      // O(n)
                     fuel = fuel + k;
                 }
             }
