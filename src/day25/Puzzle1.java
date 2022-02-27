@@ -20,7 +20,7 @@ public class Puzzle1 {
     /**
      * Step counter.
      */
-    int step = 1;
+    int steps = 1;
     
     /**
      * Number of rows and columns (for convenience).
