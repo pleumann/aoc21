@@ -31,6 +31,9 @@ const
     (8, 5, 2, 8, 5 ,5, 7, 1, 3, 1)      
   );
 
+  FrontBuffer: Integer = 18;
+  BackBuffer: Integer = 24;
+
 var
   Flashes, Round, Total, I, J: Integer;
   Dir: Boolean;
@@ -156,13 +159,29 @@ begin
 
   TextColor(0);
   TextBackground(182);
+end;
 
-  for I := 0 to 79 do
-    Poke(-168 + I, UDGs[I]);
+procedure SwitchBuffers;
+var
+  Temp: Integer;
+begin
+  Temp := FrontBuffer;
+  FrontBuffer := BackBuffer;
+  BackBuffer := Temp;
+  SetBackBuffer(BackBuffer);
+  SetFrontBuffer(FrontBuffer);
+  WaitForVSync;  
 end;
 
 begin
+  SetFrontBuffer(FrontBuffer);
+  SetBackBuffer(BackBuffer);
   Setup;
+  SwitchBuffers;
+  Setup;
+
+  for I := 0 to 79 do
+    Poke(-168 + I, UDGs[I]);
 
   Round := 0;
   Total := 0;
@@ -170,6 +189,8 @@ begin
   Dir := False;
 
   Dump;
+
+  SwitchBuffers;
 
   repeat
     Round := Round + 1;
@@ -191,10 +212,15 @@ begin
     Write(Round);
 
     Dump;
+
+    SwitchBuffers;
   until Flashes = 100;
+
+  SetFrontBuffer(18);
+  SetBackBuffer(18);
 
   TextBackground(182);
   TextColor(0);
 
-  GotoXY(32, 23); Write(' ');
+  GotoXY(32, 24); Write(' ');
 end.
