@@ -19,12 +19,21 @@ var
 
 procedure Dump;
 var
-  I, J: Integer;
+  I, J, K: Integer;
 begin
   WriteLn('Step', Round, ' has', Flashes, ' flashes.');
   for I := 0 to 9 do
   begin
-    for J := 0 to 9 do Write(Values[I][J]);
+    for J := 0 to 9 do 
+    begin
+      K := Values[I][J];
+      if K > 9 then
+      begin
+        Write(' *');
+        Values[I][J] := 0;
+      end
+      else Write(K);
+    end;  
     WriteLn;
   end;
   WriteLn;
@@ -70,13 +79,9 @@ begin
       for J := 0 to 9 do
         Cycle(I, J);
 
-    if Round <= 100 then Total := Total + Flashes;
-
-    for I := 0 to 9 do
-      for J := 0 to 9 do
-        if Values[I][J] = 10 then Values[I][J] := 0;
-
     Dump;
+
+    if Round <= 100 then Total := Total + Flashes;
   until Flashes = 100;
 
   WriteLn('Sum of flashes after 100 steps was', Total, '.');
