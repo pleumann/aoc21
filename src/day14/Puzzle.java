@@ -70,12 +70,21 @@ public class Puzzle {
                 count[idx] += polymer.get(key);
             }
 
+            long min = Long.MAX_VALUE;
+            long max = Long.MIN_VALUE;
+            
             for (char c = 'A'; c <= 'Z'; c++) {
-                System.out.println(c + " " + count[c - 'A']);
+                long l = count[c - 'A'];
+                System.out.println(c + " " + l);
+                
+                if (l != 0) {
+                    min = Long.min(l, min);
+                    max = Long.max(l, max);
+                }
             }
-
+            
             System.out.println();
-            System.out.println(count['N' - 'A'] - count['C' - 'A']);
+            System.out.println(max - min);
             
         } catch (IOException e) {
             throw new RuntimeException("Error reading input", e);
