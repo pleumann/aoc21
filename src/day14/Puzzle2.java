@@ -6,7 +6,10 @@ package day14;
 public class Puzzle2 {
     
     public static void main(String[] args) {
-        new Puzzle().process(args[0], 40);
+        Puzzle p = new Puzzle();
+        p.init(args[0]);
+        p.run(40);
+        p.done();
     }
     
 }

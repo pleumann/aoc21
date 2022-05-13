@@ -21,7 +21,7 @@ public class Puzzle {
         set.put(key, l + value);
     }
     
-    void process(String file, int steps) {
+    void init(String file) {
         try {
             System.out.println("----- Loading -----");
             System.out.println();
@@ -40,55 +40,58 @@ public class Puzzle {
                 rules.put(s.substring(0, 2), s.substring(6));
                 s = reader.readLine();
             }
-            
-            for (int i = 1; i <= steps; i++) {
-                System.out.println();
-                System.out.println("----- Step " + i + " -----");
-                System.out.println();
-                
-                HashMap<String, Long> output = new HashMap<>();
-                
-                for (String key: polymer.keySet()) {
-                    String t = rules.get(key);
-                    String from = key.substring(0, 1) + t;
-                    String to = t + key.substring(1);
-                    
-                    add(output, from, polymer.get(key));
-                    add(output, to, polymer.get(key));
-                }
-                
-                polymer = output;
-            }
-
-            System.out.println();
-            System.out.println("----- Result -----");
-            System.out.println();
-
-            long[] count = new long[26];
-            for (String key: polymer.keySet()) {
-                int idx = key.charAt(1) - 'A';
-                count[idx] += polymer.get(key);
-            }
-
-            long min = Long.MAX_VALUE;
-            long max = Long.MIN_VALUE;
-            
-            for (char c = 'A'; c <= 'Z'; c++) {
-                long l = count[c - 'A'];
-                System.out.println(c + " " + l);
-                
-                if (l != 0) {
-                    min = Long.min(l, min);
-                    max = Long.max(l, max);
-                }
-            }
-            
-            System.out.println();
-            System.out.println(max - min);
-            
         } catch (IOException e) {
             throw new RuntimeException("Error reading input", e);
         }   
+    }
+    
+    void run(int steps) {
+        for (int i = 1; i <= steps; i++) {
+            System.out.println();
+            System.out.println("----- Step " + i + " -----");
+            System.out.println();
+
+            HashMap<String, Long> output = new HashMap<>();
+
+            for (String key: polymer.keySet()) {
+                String t = rules.get(key);
+                String from = key.substring(0, 1) + t;
+                String to = t + key.substring(1);
+
+                add(output, from, polymer.get(key));
+                add(output, to, polymer.get(key));
+            }
+
+            polymer = output;
+        }
+    }
+    
+    void done() {
+        System.out.println();
+        System.out.println("----- Result -----");
+        System.out.println();
+
+        long[] count = new long[26];
+        for (String key: polymer.keySet()) {
+            int idx = key.charAt(1) - 'A';
+            count[idx] += polymer.get(key);
+        }
+
+        long min = Long.MAX_VALUE;
+        long max = Long.MIN_VALUE;
+
+        for (char c = 'A'; c <= 'Z'; c++) {
+            long l = count[c - 'A'];
+            System.out.println(c + " " + l);
+
+            if (l != 0) {
+                min = Long.min(l, min);
+                max = Long.max(l, max);
+            }
+        }
+
+        System.out.println();
+        System.out.println(max - min);
     }
     
     public static void main(String[] args) {
@@ -97,7 +100,10 @@ public class Puzzle {
             System.exit(1);
         }
         
-        new Puzzle().process(args[0], Integer.parseInt(args[1]));
+        Puzzle p = new Puzzle();
+        p.init(args[0]);
+        p.run(Integer.parseInt(args[1]));
+        p.done();
     }
     
 }
