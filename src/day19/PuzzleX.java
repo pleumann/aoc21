@@ -2,7 +2,6 @@ package day19;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +13,9 @@ import java.util.concurrent.Future;
  */
 public class PuzzleX extends Puzzle {
 
+    /**
+     * Represents a single matching task to be performed.
+     */
     class MyTask implements Callable<Boolean> {
         Scanner us, them;
         
@@ -27,6 +29,9 @@ public class PuzzleX extends Puzzle {
         }
     }
 
+    /**
+     * Executes the matching tasks. Increase argument for more cores.
+     */
     ExecutorService executor = Executors.newFixedThreadPool(8);
    
     /**
@@ -43,7 +48,7 @@ public class PuzzleX extends Puzzle {
      * a match.
      */
     void match(ArrayList<Scanner> found, Scanner us, ArrayList<Scanner> candidates) {
-        System.out.println("Searching match for scanner " + us + " within " + candidates.size() + " candidates");
+        System.out.println("Searching matches for scanner " + us + " within " + candidates.size() + " candidates");
         System.out.println();
 
         int old = found.size();
@@ -66,7 +71,7 @@ public class PuzzleX extends Puzzle {
                 }
             }
         } catch (Exception e) {
-            
+            e.printStackTrace();
         }
         
         System.out.println();

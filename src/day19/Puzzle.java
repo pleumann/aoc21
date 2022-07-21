@@ -5,12 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Day 19 "Beacon Scanner" parts 1 and 2.
@@ -20,7 +14,7 @@ public class Puzzle {
     /**
      * Holds the list of all scanners.
      */
-    ArrayList<Scanner> probes = new ArrayList<>();
+    ArrayList<Scanner> scanners = new ArrayList<>();
     
     /**
      * Creates a puzzle.
@@ -51,6 +45,10 @@ public class Puzzle {
         return result;
     }
 
+    /**
+     * Checks if the given probes match, i.e. have at least 12 overlapping
+     * points after rotating and translating the second one.
+     */
     boolean matches(Scanner us, Scanner them) {
         HashSet<String> ourPoints = us.getAll();
 
@@ -77,7 +75,7 @@ public class Puzzle {
             }
         }
 
-        System.out.write('.');
+        System.out.write('-');
         
         return false;
     }
@@ -141,7 +139,7 @@ public class Puzzle {
                 s = br.readLine();
             }
             
-            probes.add(p);
+            scanners.add(p);
             
             if ("".equals(s)) {
                 s = br.readLine();
@@ -152,13 +150,13 @@ public class Puzzle {
         
         // Use first scanner as starting point
         ArrayList<Scanner> found = new ArrayList<>();
-        found.add(probes.get(0));
-        probes.remove(0);
+        found.add(scanners.get(0));
+        scanners.remove(0);
 
         int i = 0;
         // Try to match until there are no unmatched scanners anymore
-        while (probes.size() != 0) {
-            match(found, found.get(i), probes);
+        while (scanners.size() != 0) {
+            match(found, found.get(i), scanners);
             i = (i + 1) % found.size();
         }
         
