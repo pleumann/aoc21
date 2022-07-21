@@ -71,7 +71,7 @@ public class Puzzle {
                         HashSet<String> theirPoints = them.getAll();
 
                         // ... are there at least 12 overlaps?
-                        theirPoints.retainAll(us.getAll());
+                        theirPoints.retainAll(ourPoints);
                         if (theirPoints.size() >= 12) {
                             System.out.println();
                             System.out.println("Found a match.");
@@ -147,9 +147,6 @@ public class Puzzle {
         
         System.out.println("Part 1: There are " + total.size() + " beacons total");
         System.out.println();
-        
-        int[] max = new int[] { 0, 0, 0 };
-        int[] min = new int[] { 0, 0, 0 };
         
         int dist = 0;
         
