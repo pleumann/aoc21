@@ -12,9 +12,9 @@ import java.util.HashSet;
 public class Puzzle {
 
     /**
-     * Holds the list of all probes.
+     * Holds the list of all scanners.
      */
-    ArrayList<Probe> probes = new ArrayList<>();
+    ArrayList<Scanner> probes = new ArrayList<>();
     
     /**
      * Creates a puzzle.
@@ -46,17 +46,17 @@ public class Puzzle {
     }
 
     /**
-     * Finds a match for a probe within a set of other probes. This basically
+     * Finds a match for a scanner within a set of other probes. This basically
      * brute-forces a solution by trying all rotations and all sensible
-     * translations. Whenever we have at least 12 overlapping points we have
+     * translations. Whenever we have at least 12 overlapping readings we have
      * a match.
      */
-    Probe match(Probe us, ArrayList<Probe> candidates) {
-        System.out.println("Searching match for " + us + " within " + candidates.size() + " candidates");
+    Scanner match(Scanner us, ArrayList<Scanner> candidates) {
+        System.out.println("Searching match for scanner " + us + " within " + candidates.size() + " candidates");
         HashSet<String> ourPoints = us.getAll();
 
-        for (Probe them: candidates) {
-            System.out.print("Trying " + them + " ");
+        for (Scanner them: candidates) {
+            System.out.print("Trying scanner " + them + " ");
             for (int i = 0; i < 24; i++) {
                 System.out.write('.');
                 them.setRotation(Matrix.ROT_VEC[i]);
@@ -76,7 +76,7 @@ public class Puzzle {
                             System.out.println();
                             System.out.println("Found a match.");
                             System.out.println();
-                            System.out.println(them + " must be at " + Matrix.toString(them.translation));
+                            System.out.println("Scanner " + them + " must be at " + Matrix.toString(them.translation));
                             System.out.println();
                             candidates.remove(them);
                             return them;
@@ -102,8 +102,8 @@ public class Puzzle {
         
         int number = 0;
         while (s != null) {
-            Probe p = new Probe(number);
-            System.out.println("Reading " + p + "...");
+            Scanner p = new Scanner(number);
+            System.out.println("Reading scanner " + p + "...");
             number++;
             
             s = br.readLine();
@@ -124,24 +124,27 @@ public class Puzzle {
             }
         }
         
-        // Use first probe as starting point
-        ArrayList<Probe> found = new ArrayList<>();
+        System.out.println();
+        
+        // Use first scanner as starting point
+        ArrayList<Scanner> found = new ArrayList<>();
         found.add(probes.get(0));
         probes.remove(0);
 
         int i = 0;
-        // Try to match until there are no unmatched probes anymore
+        // Try to match until there are no unmatched scanners anymore
         while (probes.size() != 0) {
-            Probe q = match(found.get(i), probes);
+            Scanner q = match(found.get(i), probes);
             if (q != null) {
                 found.add(q);
+            } else {
+                i = (i + 1) % found.size();
             }
-            i = (i + 1) % found.size();
         }
         
-        // Now that all probes use the same coordinate system, get all beacons
+        // Now that all scanners use the same coordinate system, get all beacons
         HashSet<String> total = new HashSet<>();
-        for (Probe r : found) {
+        for (Scanner r : found) {
             total.addAll(r.getAll());
         }
         
@@ -150,14 +153,14 @@ public class Puzzle {
         
         int dist = 0;
         
-        // Find the maximum distance between two readings
-        for (Probe r : found) {
+        // Find the maximum distance between two scanners
+        for (Scanner r : found) {
             int[] x = r.translation;
             if (x == null) {
                 x = new int[] { 0, 0 ,0 };
             }
             
-            for (Probe u : found) {
+            for (Scanner u : found) {
                 int[] y = u.translation;
                 if (y == null) {
                     y = new int[] { 0, 0 ,0 };

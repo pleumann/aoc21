@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- * Represents a single probe with all its readings.
+ * Represents a single scanner with all its readings.
  */
-class Probe {
+class Scanner {
 
     /**
-     * The probe's number as in the input file.
+     * The scanner's number as in the input file.
      */
     int number;
 
     /**
-     * The probe's readings, unmodified.
+     * The scanner's readings, unmodified.
      */
     ArrayList<int[]> readings = new ArrayList<>();
 
@@ -29,9 +29,9 @@ class Probe {
     int[] translation;
 
     /**
-     * Creates a probe with the given name.
+     * Creates a scanner with the given name.
      */
-    public Probe(int i) {
+    public Scanner(int i) {
         number = i;
         setRotation(Matrix.ROT_VEC[0]);
     }
@@ -104,7 +104,7 @@ class Probe {
 
     @Override
     public String toString() {
-        return "Scanner " + (number < 10 ? "0" : "") + number;
+        return "#" + (number < 10 ? "0" : "") + number;
     }
 
 }
