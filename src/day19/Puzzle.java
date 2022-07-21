@@ -5,6 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Day 19 "Beacon Scanner" parts 1 and 2.
@@ -45,52 +51,70 @@ public class Puzzle {
         return result;
     }
 
+    boolean matches(Scanner us, Scanner them) {
+        HashSet<String> ourPoints = us.getAll();
+
+        for (int i = 0; i < 24; i++) {
+            them.setRotation(Matrix.ROT_VEC[i]);
+
+            for (int j = 0; j < us.size() - 11; j++) {      // Optimized ???
+                for (int k = j + 1; k < them.size(); k++) { // Optimized ???
+                    // If we make any two points match...
+                    them.setTranslation(null);
+                    them.setTranslation(diff(them.get(k), us.get(j)));
+
+                    // ... and get the rest...
+                    HashSet<String> theirPoints = them.getAll();
+
+                    // ... are there at least 12 overlaps?
+                    theirPoints.retainAll(ourPoints);
+                    if (theirPoints.size() >= 12) {
+                        System.out.write('*');
+                        
+                        return true;
+                    }
+                }
+            }
+        }
+
+        System.out.write('.');
+        
+        return false;
+    }
+
     /**
      * Finds a match for a scanner within a set of other probes. This basically
      * brute-forces a solution by trying all rotations and all sensible
      * translations. Whenever we have at least 12 overlapping readings we have
      * a match.
      */
-    Scanner match(Scanner us, ArrayList<Scanner> candidates) {
-        System.out.println("Searching match for scanner " + us + " within " + candidates.size() + " candidates");
-        HashSet<String> ourPoints = us.getAll();
-
-        for (Scanner them: candidates) {
-            System.out.print("Trying scanner " + them + " ");
-            for (int i = 0; i < 24; i++) {
-                System.out.write('.');
-                them.setRotation(Matrix.ROT_VEC[i]);
-
-                for (int j = 0; j < us.size() - 11; j++) {      // Optimized ???
-                    for (int k = j + 1; k < them.size(); k++) { // Optimized ???
-                        // If we make any two points match...
-                        them.setTranslation(null);
-                        them.setTranslation(diff(them.get(k), us.get(j)));
-
-                        // ... and get the rest...
-                        HashSet<String> theirPoints = them.getAll();
-
-                        // ... are there at least 12 overlaps?
-                        theirPoints.retainAll(ourPoints);
-                        if (theirPoints.size() >= 12) {
-                            System.out.println();
-                            System.out.println("Found a match.");
-                            System.out.println();
-                            System.out.println("Scanner " + them + " must be at " + Matrix.toString(them.translation));
-                            System.out.println();
-                            candidates.remove(them);
-                            return them;
-                        }
-                    }
-                }
-            }
-            System.out.println();
-        }
-
-        System.out.println("No luck!");
+    void match(ArrayList<Scanner> found, Scanner us, ArrayList<Scanner> candidates) {
+        System.out.println("Searching matches for scanner " + us + " within " + candidates.size() + " candidates");
         System.out.println();
 
-        return null;
+        int old = found.size();
+        
+        for (int i = candidates.size() - 1; i >= 0; i--) {
+            Scanner them = candidates.get(i);
+            if (matches(us, them)) {
+                found.add(them);
+                candidates.remove(i);
+            }
+        }
+
+        System.out.println();
+        System.out.println();
+
+        if (old != found.size()) {
+            for (int i = old; i < found.size(); i++) {
+                Scanner them = found.get(i);
+                System.out.println("Scanner " + them + " is at " + Matrix.toString(them.translation));
+            }                
+        } else {
+            System.out.println("No luck!");
+        }
+        
+        System.out.println();
     }
 
     /**
@@ -134,12 +158,8 @@ public class Puzzle {
         int i = 0;
         // Try to match until there are no unmatched scanners anymore
         while (probes.size() != 0) {
-            Scanner q = match(found.get(i), probes);
-            if (q != null) {
-                found.add(q);
-            } else {
-                i = (i + 1) % found.size();
-            }
+            match(found, found.get(i), probes);
+            i = (i + 1) % found.size();
         }
         
         // Now that all scanners use the same coordinate system, get all beacons
@@ -149,7 +169,6 @@ public class Puzzle {
         }
         
         System.out.println("Part 1: There are " + total.size() + " beacons total");
-        System.out.println();
         
         int dist = 0;
         
