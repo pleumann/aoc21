@@ -66,6 +66,18 @@ public class Puzzle1 {
         }
         
         /**
+         * Prints the populated part of the image.
+         */
+        void dump() {
+            for (int i = x1; i <= x2; i++) {
+                for (int j = y1; j <= y2; j++) {
+                    System.out.print(get(i, j) ? '#' : '.');
+                }
+                System.out.println();
+            }
+        }
+        
+        /**
          * Returns a printable string representing the image.
          */
         @Override
@@ -145,6 +157,9 @@ public class Puzzle1 {
         for (int n = 1; n <= rounds; n++) {
             improve();
             System.out.println("Round #" + n + " image: " + image);
+            if (image.pixels.size() < 1000) {
+                image.dump();
+            }
         }        
     }
     
