@@ -20,7 +20,7 @@ import java.util.HashSet;
  * because it can run the program not only as a whole, but piecemeal (i.e. just
  * one of the 14 processing steps). The compiled code expects a "z" value going
  * into that stage and an input to process, and it returns the "z" output value.
- * This allows us to use an rather elegant recursive overall approach.
+ * This allows us to use a rather elegant recursive overall approach.
  */
 public class Puzzle1 {
 
