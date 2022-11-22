@@ -50,7 +50,7 @@ class Puzzle2 extends Puzzle1 {
             if ((s & include) != include) continue;
             
             wires.remove(i);
-            System.out.println(toChars(i));
+//            System.out.println(toChars(s));
             
             return s;
         }
